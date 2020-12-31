@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NWN.NativeSample", "NWN.NativeSample.csproj", "{617B65A1-0B48-4083-A571-B94B01A2C36B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NWN.Core.Native", "lib\NWN.Core.Native\NWN.Core.Native\NWN.Core.Native.csproj", "{B448636F-0809-4293-93A5-E9C79F02461A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{617B65A1-0B48-4083-A571-B94B01A2C36B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{617B65A1-0B48-4083-A571-B94B01A2C36B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{617B65A1-0B48-4083-A571-B94B01A2C36B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{617B65A1-0B48-4083-A571-B94B01A2C36B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B448636F-0809-4293-93A5-E9C79F02461A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B448636F-0809-4293-93A5-E9C79F02461A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B448636F-0809-4293-93A5-E9C79F02461A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B448636F-0809-4293-93A5-E9C79F02461A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
