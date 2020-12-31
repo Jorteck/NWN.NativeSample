@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using NWN.Core;
 using NWN.Core.Native;
@@ -8,10 +10,13 @@ namespace NWN
 {
   public static class Internal
   {
+    private static CServerExoApp exoServer;
+
     public static int Bootstrap(IntPtr ptr, int nativeHandlesLength)
     {
       CoreGameManager manager = new CoreGameManager();
       manager.OnSignal += OnSignal;
+
       return NWNCore.Init(ptr, nativeHandlesLength, manager);
     }
 
@@ -25,14 +30,31 @@ namespace NWN
 
     private static void NativeTest()
     {
-      CServerExoApp exoServer = NWNNative.AppManager.MPServerExoApp;
+      exoServer = NWNNative.AppManager.MPServerExoApp;
 
       Console.WriteLine($"Server Version is: {NWNNative.BuildNumber.ToMString()}.{NWNNative.BuildRevision.ToMString()}");
       Console.WriteLine($"Module Name is: {exoServer.GetModuleName().ToMString()}");
 
-      for (uint areaId = NWScript.GetFirstArea(); areaId != NWScript.OBJECT_INVALID; areaId = NWScript.GetNextArea())
+      List<uint> areas = GetAreas();
+      List<uint> objs = GetAllObjects(areas);
+
+      // while (!Debugger.IsAttached)
+      // {
+      //   continue;
+      // }
+
+      PrintAreas(areas);
+      PrintObjects(objs);
+    }
+
+    private static void PrintAreas(List<uint> areas)
+    {
+      for (int i = 0; i < areas.Count; i++)
       {
-        Console.WriteLine($"::::Resolving Area {areaId}: {NWScript.GetName(areaId)}::::");
+        uint areaId = areas[i];
+        string nextArea = i < areas.Count - 1 ? $"Next area is {NWScript.GetName(areas[i + 1])}, ID {areas[i + 1]}" : "";
+
+        Console.WriteLine($"::::Resolving Area {NWScript.GetName(areaId)}, ID {areaId}:::: {nextArea}");
         CNWSArea area = exoServer.GetGameObject(areaId).AsNWSArea();
 
         Console.WriteLine($"Area ID - Managed: {areaId} Native: {area.MIdSelf}");
@@ -41,18 +63,51 @@ namespace NWN
         Console.WriteLine($"Area comment: {area.MSComments.ToMString()}");
 
         Console.WriteLine();
+      }
+    }
 
-        for (uint objId = NWScript.GetFirstObjectInArea(areaId); objId != NWScript.OBJECT_INVALID; objId = NWScript.GetNextObjectInArea())
+    private static void PrintObjects(List<uint> objs)
+    {
+      for (int i = 0; i < objs.Count; i++)
+      {
+        uint objId = objs[i];
+        string nextObj = i < objs.Count - 1 ? $"Next object is {NWScript.GetName(objs[i + 1])}, ID {objs[i + 1]}" : "";
+
+        Console.WriteLine($"::::Resolving Object {NWScript.GetName(objId)}, ID {objId}:::: {nextObj}");
+        CGameObject gameObject = (CGameObject)exoServer.GetGameObject(objId);
+
+        ObjectType type = (ObjectType)gameObject.MNObjectType;
+        Console.WriteLine($"- Object ID - Managed: {objId} Native: {gameObject.MIdSelf}");
+        Console.WriteLine($"- Object type: {type}");
+        Console.WriteLine($"- .NET type: {gameObject.GetType().FullName}");
+
+        Console.WriteLine();
+      }
+    }
+
+    private static List<uint> GetAreas()
+    {
+      List<uint> areas = new List<uint>();
+      for (uint areaId = NWScript.GetFirstArea(); areaId != NWScript.OBJECT_INVALID; areaId = NWScript.GetNextArea())
+      {
+        areas.Add(areaId);
+      }
+
+      return areas;
+    }
+
+    private static List<uint> GetAllObjects(List<uint> areas)
+    {
+      List<uint> objs = new List<uint>();
+      foreach (uint areaId in areas)
+      {
+        for (uint objId = NWScript.GetFirstObjectInArea(areaId); objId != NWScript.OBJECT_INVALID; objId = NWScript.GetNextObjectInArea(areaId))
         {
-          Console.WriteLine($"::::Resolving GameObject {objId}: {NWScript.GetName(objId)}::::");
-          ICGameObject gameObject = exoServer.GetGameObject(objId);
-
-          Console.WriteLine($"- Object ID - Managed: {objId} Native: {gameObject.MIdSelf}");
-          Console.WriteLine($"- Object type: {(ObjectType)gameObject.MNObjectType}");
-          Console.WriteLine($"- .NET type: {gameObject.GetType().FullName}");
-          Console.WriteLine();
+          objs.Add(objId);
         }
       }
+
+      return objs;
     }
   }
 
